@@ -1,0 +1,85 @@
+services:
+  - type: web
+    name: cortexai-auth
+    env: node
+    rootDir: backend/services/auth
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+
+  - type: web
+    name: cortexai-chat
+    env: node
+    rootDir: backend/services/chat
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+
+  - type: web
+    name: cortexai-agent
+    env: node
+    rootDir: backend/services/agent
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: AUTH_SERVICE
+        fromService:
+          type: web
+          name: cortexai-auth
+          property: url
+      - key: CHAT_SERVICE
+        fromService:
+          type: web
+          name: cortexai-chat
+          property: url
+
+  - type: web
+    name: cortexai-gateway
+    env: node
+    rootDir: backend/gateway
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        sync: false
+      - key: AUTH_SERVICE
+        fromService:
+          type: web
+          name: cortexai-auth
+          property: url
+      - key: CHAT_SERVICE
+        fromService:
+          type: web
+          name: cortexai-chat
+          property: url
+      - key: AGENT_SERVICE
+        fromService:
+          type: web
+          name: cortexai-agent
+          property: url
