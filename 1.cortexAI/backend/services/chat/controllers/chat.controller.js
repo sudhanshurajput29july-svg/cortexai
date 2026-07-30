@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import Conversation from "../models/coversation.model.js"
 import Message from "../models/message.model.js"
 
@@ -45,6 +46,9 @@ export const updateConversation=async (req,res) => {
 export const saveMessage=async (req,res) => {
     try {
         const {conversationId,role,content,images,artifacts}=req.body
+        if (!conversationId || !mongoose.Types.ObjectId.isValid(conversationId)) {
+            return res.status(200).json({ message: "Skipped saving non-ObjectId conversation" })
+        }
         const message=await Message.create({
             conversationId,
             content,
@@ -60,9 +64,12 @@ export const saveMessage=async (req,res) => {
 
 export const getMessages=async (req,res) => {
     try {
-        
+        const { conversationId } = req.params;
+        if (!conversationId || !mongoose.Types.ObjectId.isValid(conversationId)) {
+            return res.status(200).json([])
+        }
         const messages=await Message.find({
-            conversationId:req.params.conversationId   
+            conversationId   
         })
         return res.status(200).json(messages)
     } catch (error) {

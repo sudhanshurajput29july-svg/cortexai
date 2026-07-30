@@ -7,7 +7,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:gateway": "npm --prefix gateway run dev",
+    "dev:auth": "npm --prefix services/auth run dev",
+    "dev:chat": "npm --prefix services/chat run dev",
+    "dev:agent": "npm --prefix services/agent run dev",
+    "dev": "npx concurrently -n \"GATEWAY,AUTH,CHAT,AGENT\" -c \"blue,green,yellow,magenta\" \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:chat\" \"npm run dev:agent\""
   },
   "dependencies": {}
 }

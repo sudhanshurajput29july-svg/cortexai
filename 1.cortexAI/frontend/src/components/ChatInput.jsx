@@ -71,8 +71,9 @@ function ChatInput() {
   const handleSendMessage = async () => {
     if (!value.trim() && !selectedFile) return;
     const promptText = value.trim()
+    const userImages = selectedFile && selectedFile.type.startsWith("image/") ? [URL.createObjectURL(selectedFile)] : []
     dispatch(setIsLoading(true))
-    dispatch(addMessage({ role: "user", content: promptText }))
+    dispatch(addMessage({ role: "user", content: promptText, images: userImages }))
     setValue("")
 
     let conversation = selectedConversation
@@ -158,6 +159,13 @@ function ChatInput() {
 
   ]
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSendMessage()
+    }
+  }
+
   return (
     <div className='w-full overflow-hidden px-3 md:px-5 py-4 border-t border-white/[0.06] bg-[#0d0f14]'>
       <div className='flex flex-col gap-2 bg-white/[0.03] border border-white/[0.07] rounded-2xl px-4 pt-3.5 pb-3'>
@@ -237,6 +245,7 @@ function ChatInput() {
         <textarea
           placeholder='Ask Anything...'
           onChange={(e) => setValue(e.target.value)}
+          onKeyDown={handleKeyDown}
           value={value}
           className="w-full bg-transparent outline-none resize-none text-[14px] text-slate-200 placeholder:text-slate-600 leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden disabled:opacity-50"
           rows={3}

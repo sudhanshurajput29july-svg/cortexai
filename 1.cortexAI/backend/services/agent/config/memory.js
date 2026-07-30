@@ -8,9 +8,11 @@ export const getMemory=async (conversationId)=>{
     }
     
     const messages=await getMessages(conversationId)
-    await store.set(key,JSON.stringify(messages),"EX",24*60*60)
+    if (Array.isArray(messages)) {
+        await store.set(key,JSON.stringify(messages),"EX",24*60*60)
+    }
     
-    return messages
+    return Array.isArray(messages) ? messages : []
 }
 
 export const addMessage=async (conversationId,role,content)=>{

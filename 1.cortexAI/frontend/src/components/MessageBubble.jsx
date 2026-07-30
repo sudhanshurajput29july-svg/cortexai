@@ -5,6 +5,19 @@ import Markdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
+const getImageUrl = (url) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("blob:") || url.startsWith("data:")) {
+    return url;
+  }
+  const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000";
+  const path = url.startsWith("/") ? url : `/${url}`;
+  if (!path.startsWith("/api/agent") && !path.startsWith("/api/")) {
+    return `${serverUrl}/api/agent${path}`;
+  }
+  return `${serverUrl}${path}`;
+};
+
 function MessageBubble({ role, content, images }) {
   const isUser = role === "user"
   const [lightBox, setLightBox] = useState(null)
@@ -31,19 +44,23 @@ function MessageBubble({ role, content, images }) {
         }`}>
 
 
-        {images.length > 0 && (
+        {images && images.length > 0 && (
           <div className='flex flex-wrap gap-3 mt-4'>
-            {images.map((img, i) => (
-              <img
-                key={i}
-                src={img}
-                onClick={() => setLightBox(img)}
-                loading="lazy"
-                onError={(e) => e.currentTarget.remove()}
-                className="w-40 h-28 rounded-xl object-cover border border-white/10 cursor-zoom-in hover:opacity-90 transition"
-
-              />
-            ))}
+            {images.map((img, i) => {
+              const fullSrc = getImageUrl(img);
+              return (
+                <img
+                  key={i}
+                  src={fullSrc}
+                  onClick={() => setLightBox(fullSrc)}
+                  loading="lazy"
+                  onError={(e) => {
+                    console.warn("Failed to load image:", fullSrc);
+                  }}
+                  className="w-40 h-28 rounded-xl object-cover border border-white/10 cursor-zoom-in hover:opacity-90 transition"
+                />
+              );
+            })}
           </div>
         )}
 
@@ -167,17 +184,21 @@ function MessageBubble({ role, content, images }) {
                 </div>
               )
             },
-          img:({src})=>{
-            if(!src)return null;
+          img: ({ src, alt }) => {
+            if (!src) return null;
+            const fullSrc = getImageUrl(src);
             return (
               <img
-                src={src}
-                onClick={() => setLightBox(src)}
+                src={fullSrc}
+                alt={alt || "Image"}
+                onClick={() => setLightBox(fullSrc)}
                 loading="lazy"
-                onError={(e) => e.currentTarget.remove()}
-                className="w-40 h-28 rounded-xl object-cover border border-white/10 cursor-zoom-in hover:opacity-90 transition"
+                onError={(e) => {
+                  console.warn("Failed to load markdown image:", fullSrc);
+                }}
+                className="max-w-full max-h-96 rounded-xl object-contain border border-white/10 cursor-zoom-in hover:opacity-90 transition my-2"
               />
-            )
+            );
           }
 
 

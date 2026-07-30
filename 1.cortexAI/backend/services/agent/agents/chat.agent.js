@@ -13,7 +13,7 @@ export const chatAgent = async (state) => {
 
         const llm = await getModel("chat");
         if (llm) {
-            const history = await getMemory(state.conversationId);
+            const history = (await getMemory(state.conversationId)) || [];
             const searchContext = state.searchResults ? `\nWeb Search Results:\n${JSON.stringify(state.searchResults)}\nAnswer the user using only the above search results.\n` : "";
 
             const systemPrompt = `
@@ -28,7 +28,7 @@ Rules:
 - Keep paragraphs short and readable.
 `;
             const messages = [new SystemMessage(systemPrompt)];
-            history.forEach(msg => {
+            (history || []).forEach(msg => {
                 if (msg.role == "user") messages.push(new HumanMessage(msg.content));
                 if (msg.role == "assistant") messages.push(new AIMessage(msg.content));
             });

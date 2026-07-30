@@ -26,36 +26,47 @@ export const login = async (req, res) => {
             }
         }
 
-        let user = await User.findOne({
-            firebaseUid: decoded.uid
-        })
-
-        if (!user) {
-            user = await User.create({
-                firebaseUid: decoded.uid,
-                name: decoded.name,
-                email: decoded.email,
-                avatar: decoded.picture
+        let user;
+        try {
+            user = await User.findOne({
+                firebaseUid: decoded.uid
             })
+
+            if (!user) {
+                user = await User.create({
+                    firebaseUid: decoded.uid,
+                    name: decoded.name,
+                    email: decoded.email,
+                    avatar: decoded.picture
+                })
+            }
+        } catch (dbErr) {
+            console.warn("DB operation timed out or failed in login, falling back to session user:", dbErr.message)
+            user = {
+                _id: decoded.uid || "guest_user",
+                firebaseUid: decoded.uid,
+                name: decoded.name || "User",
+                email: decoded.email || "user@example.com",
+                avatar: decoded.picture || "",
+                plan: "Free",
+                credits: 100,
+                totalCredits: 100
+            }
         }
 
         const sessionId = crypto.randomUUID()
-        await store.set(`user-session-${user?._id}`,
-            sessionId
-            , "EX", 7 * 24 * 60 * 60)
+        const userIdStr = String(user._id)
+        await store.set(`user-session-${userIdStr}`, sessionId, "EX", 7 * 24 * 60 * 60)
         await store.set(`session-${sessionId}`, JSON.stringify({
-            userId: user._id,
+            userId: userIdStr,
             name: user.name,
             email: user.email,
             avatar: user.avatar,
-            plan: user.plan,
-            credits: user.credits,
-            totalCredits: user.totalCredits,
-            planExpiresAt: user.planExpiresAt
+            plan: user.plan || "Free",
+            credits: user.credits ?? 100,
+            totalCredits: user.totalCredits ?? 100,
+            planExpiresAt: user.planExpiresAt || null
         }), "EX", 7 * 24 * 60 * 60)
-
-
-
 
         const isProduction = process.env.NODE_ENV === "production";
         res.cookie("session", sessionId, {
