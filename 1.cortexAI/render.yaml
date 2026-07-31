@@ -2,7 +2,7 @@ services:
   - type: web
     name: cortexai-auth
     env: node
-    rootDir: backend/services/auth
+    rootDir: 1.cortexAI/backend/services/auth
     buildCommand: npm install
     startCommand: node index.js
     envVars:
@@ -14,7 +14,7 @@ services:
   - type: web
     name: cortexai-chat
     env: node
-    rootDir: backend/services/chat
+    rootDir: 1.cortexAI/backend/services/chat
     buildCommand: npm install
     startCommand: node index.js
     envVars:
@@ -26,7 +26,7 @@ services:
   - type: web
     name: cortexai-agent
     env: node
-    rootDir: backend/services/agent
+    rootDir: 1.cortexAI/backend/services/agent
     buildCommand: npm install
     startCommand: node index.js
     envVars:
@@ -60,7 +60,7 @@ services:
   - type: web
     name: cortexai-gateway
     env: node
-    rootDir: backend/gateway
+    rootDir: 1.cortexAI/backend/gateway
     buildCommand: npm install
     startCommand: node index.js
     envVars:
