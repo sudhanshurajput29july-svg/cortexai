@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -16,7 +16,14 @@ const firebaseConfig = {
 
 // Initialize Firebase cleanly for Vite HMR
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+export const analytics = typeof window !== 'undefined' ? (async () => {
+  try {
+    const supported = await isSupported();
+    return supported ? getAnalytics(app) : null;
+  } catch (e) {
+    return null;
+  }
+})() : null;
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
