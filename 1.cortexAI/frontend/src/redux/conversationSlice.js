@@ -8,7 +8,7 @@ const conversationSlice=createSlice({
     },
     reducers:{
        setConversations:(state,action)=>{
-        state.conversations=action.payload
+        state.conversations=Array.isArray(action.payload) ? action.payload : []
        },
        addConversation:(state,action)=>{
         state.conversations.unshift(action.payload)

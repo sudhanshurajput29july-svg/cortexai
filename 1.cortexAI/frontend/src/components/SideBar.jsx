@@ -147,7 +147,7 @@ function SideBar() {
                     </button>
                 </div>
 
-                {conversations.length == 0
+                {(!conversations || conversations.length == 0)
                     ?
                     <div className='px-5 pt-4 pb-1.5 text-[10.5px] font-semibold uppercase tracking-widest text-slate-600'>
                         No Recent Conversations
