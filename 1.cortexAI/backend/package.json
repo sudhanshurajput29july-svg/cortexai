@@ -11,7 +11,9 @@
     "dev:auth": "npm --prefix services/auth run dev",
     "dev:chat": "npm --prefix services/chat run dev",
     "dev:agent": "npm --prefix services/agent run dev",
-    "dev": "npx concurrently -n \"GATEWAY,AUTH,CHAT,AGENT\" -c \"blue,green,yellow,magenta\" \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:chat\" \"npm run dev:agent\""
+    "dev": "npx concurrently -n \"GATEWAY,AUTH,CHAT,AGENT\" -c \"blue,green,yellow,magenta\" \"npm run dev:gateway\" \"npm run dev:auth\" \"npm run dev:chat\" \"npm run dev:agent\"",
+    "postinstall": "npm --prefix gateway install && npm --prefix services/auth install && npm --prefix services/chat install && npm --prefix services/agent install",
+    "start": "node start.js"
   },
   "dependencies": {}
 }
